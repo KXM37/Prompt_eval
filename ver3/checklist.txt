@@ -1,0 +1,847 @@
+Scoring System (UPDATED)
+Total Score: 0-150 points
+Point Allocation Options (Choose one):
+Option A: Equal Weight
+
+37 total metrics
+Each metric: ~4.05 points (150 / 37)
+Simple, democratic weighting
+
+Option B: Group-Based Weight
+pythonPOINT_ALLOCATION = {
+    "structure_clarity": 25 points (5 metrics = 5 pts each),
+    "context_information": 25 points (5 metrics = 5 pts each),
+    "reasoning_cognition": 30 points (6 metrics = 5 pts each),
+    "safety_alignment": 30 points (6 metrics = 5 pts each),
+    "format_style": 15 points (5 metrics = 3 pts each),
+    "output_quality": 20 points (6 metrics = ~3.3 pts each),
+    "advanced_features": 5 points (3 metrics = ~1.67 pts each)
+}
+Total = 150 points
+```
+
+**Option C: Custom Priority Weight**
+- You define which metrics are worth more
+- Example: "Clarity & Specificity" = 8 pts, "Memory Anchoring" = 2 pts
+
+**Question: Which option do you prefer?** (I recommend Option B for balanced groups)
+
+---
+
+## 📊 Core Components (UPDATED)
+
+### 1. **Evaluator Module**
+   - **Custom Function Evaluator** (10 metrics)
+     - Pattern matching, keyword detection
+     - Returns: score (0-max_points) + evidence
+   
+   - **LLM Judge Evaluator** (27 metrics)
+     - **FIRST RUN**: Evaluate all 27 metrics in batches (e.g., 5 metrics per API call)
+     - **SUBSEQUENT RUNS**: Only re-evaluate metrics that scored below threshold
+     - Returns: score (0-max_points) + justification
+
+### 2. **Prompt Improver Module**
+   - Takes: original prompt + all metrics below threshold
+   - Generates improved version targeting ALL low-scoring metrics
+   - **Output Format**: 
+```
+     IMPROVED PROMPT:
+     [new prompt text]
+     
+     CHANGES MADE:
+     - [Metric 1]: [explanation of improvement]
+     - [Metric 2]: [explanation of improvement]
+     ...
+3. Iteration Manager (UPDATED)
+
+Tracks versions (v1, v2, v3...)
+Stores all evaluations
+NEW: Maintains "best_prompt" tracker
+
+Compares current score vs. best score
+Updates best_prompt if current > best
+
+
+Decides when to stop (threshold or max iterations)
+
+4. Results Tracker (UPDATED)
+
+Logs each iteration's scores
+Returns highest-scoring prompt at end
+Visualizes improvement over time
+Generates comparison reports
+
+
+🔧 Step-by-Step Build Plan (UPDATED)
+Step 1: Define Scoring & Weights 🆕
+
+Choose point allocation system
+Create scoring config
+Build score calculator function
+
+Step 2: Custom Function Metrics
+
+Build 10 rule-based detectors
+Each returns 0 to max_points for that metric
+Test with sample prompts
+
+Step 3: LLM Judge Setup (UPDATED)
+
+Design batched evaluation prompt
+Test with first batch (5 metrics)
+Validate scoring on 0-max_points scale
+Create batch processing logic
+
+Step 4: Full Evaluator Pipeline (UPDATED)
+
+Combine custom + LLM evaluators
+First run: all metrics in batches
+Subsequent runs: only below-threshold metrics
+Output: comprehensive score report (total /150)
+
+Step 5: Prompt Improver (UPDATED)
+
+Design improvement prompt
+Feed ALL below-threshold metrics + original prompt
+Generate improved prompt + change explanations
+Format: prompt first, explanations second
+
+Step 6: Iteration Loop (UPDATED)
+
+Connect evaluator → improver → evaluator
+Track versions and scores
+Maintain best_prompt tracker
+Set stopping criteria:
+
+Target: 120+/150 (80%)
+OR max 5 iterations
+OR improvement < 3 points
+
+
+
+Step 7: Results & Best Prompt Return 🆕
+
+Return highest-scoring prompt from all iterations
+Show which version was best
+Display final score breakdown
+
+Step 8: Visualization & Reporting
+
+Plot score progression
+Highlight best iteration
+Show before/after comparison
+Generate summary metrics
+
+```plaintext
+================================================================================
+PROMPT EVALUATION & OPTIMIZATION SYSTEM
+IMPLEMENTATION CHECKLIST FOR JUNIOR AI ENGINEER
+================================================================================
+
+PROJECT OVERVIEW:
+Build a scientific prompt optimization system that evaluates prompts on 37 
+metrics (0-150 points), iteratively improves them, and tracks the best version.
+
+TOTAL ESTIMATED TIME: 3-4 days (24-32 hours)
+
+PREREQUISITES:
+- Python 3.8+
+- Basic understanding of APIs and regex
+- Familiarity with data structures
+- Access to Anthropic API key (for production mode)
+
+================================================================================
+PHASE 1: SETUP & CONFIGURATION
+================================================================================
+Estimated Time: 2-3 hours
+
+[ ] Task 1.1: Project Setup
+    - Create project directory structure
+    - Set up virtual environment
+    - Install dependencies (anthropic, matplotlib, pandas, numpy)
+    - Create requirements.txt
+    ETA: 30 minutes
+
+[ ] Task 1.2: Define Metric Configuration
+    - Create METRIC_CONFIG dictionary with all 37 metrics
+    - Define metric properties (type, max_points, threshold, group, description)
+    - Verify all indices are correct (1, 3, 5, 10, 11, etc.)
+    - Create GROUP_TOTALS dictionary
+    ETA: 1 hour
+
+[ ] Task 1.3: Define System Configuration
+    - Create CONFIG dictionary
+    - Set max_score (150)
+    - Set max_iterations (5)
+    - Set target_score (120)
+    - Set min_improvement (3)
+    - Set llm_batch_size (5)
+    ETA: 15 minutes
+
+[ ] Task 1.4: Verify Configuration
+    - Print all metrics grouped by category
+    - Verify point totals add up to 150
+    - Check threshold calculations (70% of max)
+    - Count LLM judge vs custom function metrics
+    ETA: 30 minutes
+
+[ ] Task 1.5: Create Test Data
+    - Create 3-5 sample prompts of varying quality (minimal, basic, complex)
+    - Document expected score ranges for each
+    ETA: 45 minutes
+
+
+================================================================================
+PHASE 2: CUSTOM FUNCTION METRICS EVALUATOR
+================================================================================
+Estimated Time: 4-5 hours
+
+[ ] Task 2.1: Create CustomMetricEvaluator Class
+    - Set up class structure
+    - Initialize with metric_config
+    - Create evaluate_all() method skeleton
+    - Create _evaluate_metric() router method
+    ETA: 30 minutes
+
+[ ] Task 2.2: Implement Pattern Detection Functions (10 total)
+    
+    [ ] 2.2a: Structured / Numbered Instructions
+        - Detect numbered lists (1. 2. or 1) 2))
+        - Detect bullet points (-, *, •)
+        - Detect markdown headers (# ## ###)
+        - Return graduated score based on presence
+        ETA: 45 minutes
+    
+    [ ] 2.2b: Examples or Demonstrations
+        - Detect example keywords (example, for instance, e.g., etc.)
+        - Detect code blocks (```)
+        - Detect quoted examples
+        - Return score based on count and quality
+        ETA: 45 minutes
+    
+    [ ] 2.2c: Use of Role or Persona
+        - Detect "you are", "act as", "assume the role"
+        - Detect implicit role words (expert, professional, etc.)
+        - Return full points for explicit, partial for implicit
+        ETA: 30 minutes
+    
+    [ ] 2.2d: Audience Specification
+        - Detect "for [audience]", "target audience", "explain to"
+        - Detect implicit audience (beginners, experts, etc.)
+        - Return score based on specificity
+        ETA: 30 minutes
+    
+    [ ] 2.2e: Output Validation Hooks
+        - Detect validation keywords (validate, verify, check, ensure)
+        - Count unique validation terms
+        - Return score based on count
+        ETA: 20 minutes
+    
+    [ ] 2.2f: Time/Effort Estimation Request
+        - Detect "estimate time", "how long", "effort required"
+        - Return full points if found, 0 otherwise
+        ETA: 15 minutes
+    
+    [ ] 2.2g: Self-Repair Loops
+        - Detect iteration keywords (iterate, refine, improve, revise)
+        - Count unique self-repair terms
+        - Return graduated score
+        ETA: 20 minutes
+    
+    [ ] 2.2h: Memory Anchoring
+        - Detect "remember", "recall", "previously", "context from"
+        - Return graduated score based on count
+        ETA: 20 minutes
+    
+    [ ] 2.2i: Calibration Requests
+        - Detect "calibrate", "confidence level", "certainty"
+        - Return full points if found
+        ETA: 15 minutes
+    
+    [ ] 2.2j: Comparison Requests
+        - Detect "compare", "vs", "versus", "contrast"
+        - Return graduated score based on count
+        ETA: 15 minutes
+
+[ ] Task 2.3: Test Custom Evaluator
+    - Test each metric function individually
+    - Test evaluate_all() with sample prompts
+    - Verify scores are within valid ranges (0 to max_points)
+    - Check evidence strings are meaningful
+    ETA: 1 hour
+
+[ ] Task 2.4: Debug and Refine
+    - Fix any regex issues
+    - Adjust scoring thresholds if needed
+    - Add edge case handling
+    ETA: 30 minutes
+
+
+================================================================================
+PHASE 3: LLM JUDGE EVALUATOR
+================================================================================
+Estimated Time: 4-5 hours
+
+[ ] Task 3.1: Create LLMJudgeEvaluator Class
+    - Set up class structure
+    - Initialize with metric_config, config, api_key
+    - Initialize Anthropic client
+    - Create evaluate_all() method skeleton
+    ETA: 30 minutes
+
+[ ] Task 3.2: Implement Batching Logic
+    - Create _create_batches() method (split list into chunks)
+    - Test with sample metric names
+    - Verify batch sizes are correct
+    ETA: 30 minutes
+
+[ ] Task 3.3: Build Evaluation Prompt Generator
+    - Create _build_evaluation_prompt() method
+    - Include prompt to evaluate
+    - List metrics with descriptions and max points
+    - Specify JSON output format
+    - Add scoring guidelines (0%, 25%, 50%, 75%, 100%)
+    ETA: 1 hour
+
+[ ] Task 3.4: Implement API Call Logic
+    - Create _evaluate_batch() method
+    - Call Anthropic API with evaluation prompt
+    - Use model: claude-sonnet-4-20250514
+    - Set temperature: 0 (consistent scoring)
+    - Set max_tokens: 4000
+    - Add error handling and retry logic
+    ETA: 1 hour
+
+[ ] Task 3.5: Implement Response Parser
+    - Create _parse_evaluation_response() method
+    - Extract JSON from response (handle markdown code blocks)
+    - Parse score and justification for each metric
+    - Cap scores at max_points
+    - Handle missing metrics gracefully
+    - Return structured results dictionary
+    ETA: 1 hour
+
+[ ] Task 3.6: Test LLM Judge (with API)
+    - Test with 1-2 sample prompts
+    - Verify JSON parsing works
+    - Check scores are reasonable
+    - Review justifications for quality
+    ETA: 45 minutes
+
+[ ] Task 3.7: Create Mock LLM Evaluator
+    - Create mock_llm_evaluation() function
+    - Analyze prompt characteristics (length, structure, keywords)
+    - Return mock scores based on heuristics
+    - Use for testing without API costs
+    ETA: 45 minutes
+
+[ ] Task 3.8: Test Mock Evaluator
+    - Verify mock produces reasonable scores
+    - Test with various prompt types
+    ETA: 15 minutes
+
+
+================================================================================
+PHASE 4: UNIFIED EVALUATOR PIPELINE
+================================================================================
+Estimated Time: 3-4 hours
+
+[ ] Task 4.1: Create PromptEvaluator Class
+    - Set up class structure
+    - Initialize custom and LLM evaluators
+    - Create evaluate() method skeleton
+    ETA: 30 minutes
+
+[ ] Task 4.2: Implement Evaluation Logic
+    - Call custom evaluator (always all metrics)
+    - Call LLM evaluator (all on first run, selective on subsequent)
+    - Combine results from both evaluators
+    - Handle first_run vs re-evaluation logic
+    ETA: 1 hour
+
+[ ] Task 4.3: Implement Results Compilation
+    - Create _compile_results() method
+    - Calculate total score (sum all metric scores)
+    - Calculate percentage
+    - Identify below-threshold metrics
+    - Calculate group-level scores
+    - Create comprehensive results dictionary
+    ETA: 1 hour
+
+[ ] Task 4.4: Implement Summary Printing
+    - Create _print_summary() method
+    - Display total score
+    - Display group scores
+    - List below-threshold metrics
+    - Format output cleanly
+    ETA: 30 minutes
+
+[ ] Task 4.5: Implement Detailed Report Generator
+    - Create generate_detailed_report() method
+    - Include prompt text
+    - Group-by-group breakdown
+    - Metric-by-metric details with evidence/justification
+    - Summary of improvements needed
+    - Return formatted text string
+    ETA: 1 hour
+
+[ ] Task 4.6: Test Unified Evaluator
+    - Test with 3 sample prompts (simple, moderate, complex)
+    - Verify scores make sense
+    - Check group scores sum correctly
+    - Review detailed reports
+    ETA: 30 minutes
+
+
+================================================================================
+PHASE 5: PROMPT IMPROVER
+================================================================================
+Estimated Time: 3-4 hours
+
+[ ] Task 5.1: Create PromptImprover Class
+    - Set up class structure
+    - Initialize with metric_config, config, api_key
+    - Create improve_prompt() method skeleton
+    ETA: 30 minutes
+
+[ ] Task 5.2: Build Improvement Prompt Generator
+    - Create _build_improvement_prompt() method
+    - Include original prompt
+    - List all below-threshold metrics with details
+    - Group metrics by category
+    - Include improvement strategies for each category
+    - Specify output format (prompt first, then changes)
+    - Add critical requirements (preserve intent, add substance)
+    ETA: 1.5 hours
+
+[ ] Task 5.3: Implement API Call for Improvement
+    - Call Anthropic API with improvement prompt
+    - Use model: claude-sonnet-4-20250514
+    - Set temperature: 0.3 (slightly creative)
+    - Set max_tokens: 8000
+    - Add error handling
+    ETA: 30 minutes
+
+[ ] Task 5.4: Implement Response Parser
+    - Create _parse_improvement_response() method
+    - Split response into improved_prompt and change_explanations
+    - Handle different response formats
+    - Strip markdown formatting
+    - Return structured dictionary
+    ETA: 45 minutes
+
+[ ] Task 5.5: Create Mock Improver
+    - Create _mock_improve_prompt() function
+    - Analyze what's missing from original
+    - Generate template improved prompt
+    - Add common improvements (structure, examples, role, etc.)
+    - Return mock improvement result
+    ETA: 45 minutes
+
+[ ] Task 5.6: Test Prompt Improver
+    - Test with evaluation results from Phase 4
+    - Verify improved prompts are actually better
+    - Check change explanations are clear
+    - Test both real and mock modes
+    ETA: 45 minutes
+
+
+================================================================================
+PHASE 6: ITERATION MANAGER
+================================================================================
+Estimated Time: 4-5 hours
+
+[ ] Task 6.1: Create PromptOptimizer Class
+    - Set up class structure
+    - Initialize evaluator and improver
+    - Create history tracking (list)
+    - Create best_result tracking (dict)
+    ETA: 30 minutes
+
+[ ] Task 6.2: Implement Optimization Loop
+    - Create optimize() method
+    - Accept initial_prompt, max_iterations, target_score, min_improvement
+    - Initialize tracking variables
+    - Implement while loop with iteration counter
+    ETA: 1 hour
+
+[ ] Task 6.3: Implement Iteration Logic
+    - First iteration: evaluate all metrics
+    - Subsequent iterations: evaluate only below-threshold metrics
+    - Store iteration data in history
+    - Update best_result if current score is higher
+    - Print iteration progress
+    ETA: 1.5 hours
+
+[ ] Task 6.4: Implement Stopping Conditions
+    - Check if target score reached
+    - Check if all metrics above threshold
+    - Check if max iterations reached
+    - Check if improvement is minimal (<3 points)
+    - Break loop when any condition met
+    ETA: 30 minutes
+
+[ ] Task 6.5: Implement Improvement Generation
+    - Call improver.improve_prompt() after each evaluation
+    - Store improvement data in iteration history
+    - Update current_prompt for next iteration
+    ETA: 30 minutes
+
+[ ] Task 6.6: Implement Results Compilation
+    - Create _compile_optimization_results() method
+    - Calculate summary statistics
+    - Identify best version
+    - Create final results dictionary
+    - Print final summary
+    ETA: 45 minutes
+
+[ ] Task 6.7: Implement Utility Methods
+    - get_best_prompt() - return best prompt text
+    - get_improvement_trajectory() - return score history
+    - generate_optimization_report() - comprehensive text report
+    ETA: 45 minutes
+
+[ ] Task 6.8: Test Iteration Manager
+    - Test with 2-3 sample prompts
+    - Verify iterations run correctly
+    - Check best prompt tracking works (including regression cases)
+    - Verify stopping conditions trigger properly
+    ETA: 1 hour
+
+
+================================================================================
+PHASE 7: VISUALIZATION & REPORTING
+================================================================================
+Estimated Time: 4-5 hours
+
+[ ] Task 7.1: Create Basic Visualization Function
+    - Create visualize_evaluation() function
+    - Accept evaluation result dictionary
+    - Create 2x2 subplot layout
+    - Use matplotlib
+    ETA: 30 minutes
+
+[ ] Task 7.2: Implement Visualization Components
+    
+    [ ] 7.2a: Overall Score Gauge
+        - Draw circular gauge
+        - Color code by percentage (green/orange/red)
+        - Display score prominently
+        ETA: 30 minutes
+    
+    [ ] 7.2b: Group Scores Bar Chart
+        - Horizontal bar chart
+        - Show actual vs max scores
+        - Color code bars
+        ETA: 30 minutes
+    
+    [ ] 7.2c: Metrics Status Pie Chart
+        - Show above vs below threshold
+        - Include counts
+        ETA: 20 minutes
+    
+    [ ] 7.2d: Group Performance Percentages
+        - Bar chart with threshold line
+        - Add percentage labels
+        ETA: 30 minutes
+
+[ ] Task 7.3: Create Optimization Progress Visualization
+    - Create visualize_optimization_progress() function
+    - Accept optimization results
+    - Create 2x2 or 3x3 layout
+    ETA: 30 minutes
+
+[ ] Task 7.4: Implement Progress Charts
+    
+    [ ] 7.4a: Score Timeline
+        - Line chart with markers
+        - Highlight best iteration with star
+        - Show target line
+        ETA: 30 minutes
+    
+    [ ] 7.4b: Below-Threshold Metrics Count
+        - Bar chart per iteration
+        - Color code by severity
+        ETA: 20 minutes
+    
+    [ ] 7.4c: Score Changes Per Iteration
+        - Bar chart showing deltas
+        - Green for positive, red for negative
+        ETA: 20 minutes
+    
+    [ ] 7.4d: Best Version Group Heatmap
+        - Horizontal bars with percentages
+        - Show threshold line
+        ETA: 20 minutes
+
+[ ] Task 7.5: Create Comprehensive Dashboard
+    - Create _create_dashboard() method
+    - Combine all visualizations
+    - Add title and statistics panel
+    - Use grid layout (3x3)
+    ETA: 1 hour
+
+[ ] Task 7.6: Test Visualizations
+    - Generate with sample results
+    - Verify all charts render correctly
+    - Check colors and labels
+    ETA: 30 minutes
+
+
+================================================================================
+PHASE 8: DEMO PACKAGE & USER INTERFACE
+================================================================================
+Estimated Time: 3-4 hours
+
+[ ] Task 8.1: Create PromptOptimizationDemo Class
+    - Set up class with simple interface
+    - Accept api_key and use_mock parameters
+    - Initialize optimizer
+    - Setup mock mode if requested
+    ETA: 45 minutes
+
+[ ] Task 8.2: Implement Core Demo Methods
+    - run_optimization() - main interface method
+    - get_best_prompt() - return best prompt
+    - print_summary() - formatted summary output
+    ETA: 1 hour
+
+[ ] Task 8.3: Implement Export Functionality
+    - Create export_results() method
+    - Create output directory
+    - Export best prompt (TXT)
+    - Export full report (TXT)
+    - Export iteration history (CSV)
+    - Export all prompts (separate files)
+    - Export visualization (PNG)
+    - Export results data (JSON)
+    ETA: 1.5 hours
+
+[ ] Task 8.4: Create Quick-Start Functions
+    - quick_evaluate() - evaluate single prompt
+    - quick_optimize() - optimize with defaults
+    - run_complete_demo() - interactive guided demo
+    ETA: 45 minutes
+
+[ ] Task 8.5: Create Quick Reference Guide
+    - print_quick_reference() function
+    - Include scoring system overview
+    - Include usage examples
+    - Include available functions
+    - Format as ASCII art box
+    ETA: 30 minutes
+
+[ ] Task 8.6: Test Demo Package
+    - Run complete demo with sample prompt
+    - Test export functionality
+    - Verify all files are created correctly
+    - Test quick functions
+    ETA: 30 minutes
+
+
+================================================================================
+PHASE 9: TESTING & VALIDATION
+================================================================================
+Estimated Time: 3-4 hours
+
+[ ] Task 9.1: Unit Tests for Custom Metrics
+    - Test each custom function with positive cases
+    - Test with negative cases (should return 0 or low scores)
+    - Test edge cases (empty strings, special characters)
+    ETA: 1 hour
+
+[ ] Task 9.2: Integration Test - Full Pipeline
+    - Create test_full_pipeline() function
+    - Test with minimal prompt
+    - Test with moderate prompt
+    - Test with complex prompt
+    - Verify scores increase through iterations
+    ETA: 1 hour
+
+[ ] Task 9.3: Test Best Prompt Tracking
+    - Create scenario where iteration 3 is best but system runs 5 iterations
+    - Verify best_result points to iteration 3
+    - Verify correct prompt is returned
+    ETA: 30 minutes
+
+[ ] Task 9.4: Test Stopping Conditions
+    - Test target score reached scenario
+    - Test all metrics above threshold scenario
+    - Test max iterations reached
+    - Test minimal improvement scenario
+    ETA: 45 minutes
+
+[ ] Task 9.5: Test Error Handling
+    - Test with invalid API key (should use mock)
+    - Test with malformed prompts
+    - Test with API timeout
+    - Verify graceful failures
+    ETA: 45 minutes
+
+[ ] Task 9.6: Validate Scoring Accuracy
+    - Manually review 5-10 prompt evaluations
+    - Check if scores align with quality
+    - Adjust thresholds if needed
+    ETA: 1 hour
+
+
+================================================================================
+PHASE 10: DOCUMENTATION & POLISH
+================================================================================
+Estimated Time: 3-4 hours
+
+[ ] Task 10.1: Write README.md
+    - Project overview
+    - Installation instructions
+    - Quick start guide
+    - Usage examples
+    - API reference
+    ETA: 1.5 hours
+
+[ ] Task 10.2: Add Docstrings
+    - Add docstrings to all classes
+    - Add docstrings to all public methods
+    - Include parameter descriptions
+    - Include return value descriptions
+    - Add usage examples where helpful
+    ETA: 1 hour
+
+[ ] Task 10.3: Create Examples Directory
+    - Create examples/basic_usage.py
+    - Create examples/advanced_usage.py
+    - Create examples/batch_processing.py
+    ETA: 45 minutes
+
+[ ] Task 10.4: Create Summary Document
+    - Generate SYSTEM_SUMMARY.txt
+    - Include architecture overview
+    - Include design decisions
+    - Include usage guide
+    ETA: 45 minutes
+
+[ ] Task 10.5: Clean Up Code
+    - Remove debug print statements
+    - Fix formatting inconsistencies
+    - Add comments for complex logic
+    - Organize imports
+    ETA: 30 minutes
+
+
+================================================================================
+PHASE 11: FINAL TESTING & DEPLOYMENT PREP
+================================================================================
+Estimated Time: 2-3 hours
+
+[ ] Task 11.1: End-to-End Test with Real API
+    - Switch to use_mock=False
+    - Test with real Anthropic API
+    - Verify results are high quality
+    - Time the execution
+    ETA: 1 hour
+
+[ ] Task 11.2: Create Demo Video/Screenshots
+    - Run demo with screen recording
+    - Capture key visualizations
+    - Document typical results
+    ETA: 30 minutes
+
+[ ] Task 11.3: Performance Testing
+    - Test with 10+ different prompts
+    - Measure average execution time
+    - Measure API usage (calls per optimization)
+    - Document results
+    ETA: 1 hour
+
+[ ] Task 11.4: Create requirements.txt
+    - List all dependencies with versions
+    - Test installation in fresh environment
+    ETA: 15 minutes
+
+[ ] Task 11.5: Final Code Review
+    - Review all code for quality
+    - Check for security issues (API key handling)
+    - Verify error messages are helpful
+    - Ensure consistent naming conventions
+    ETA: 30 minutes
+
+
+================================================================================
+COMPLETION CHECKLIST
+================================================================================
+
+[ ] All 37 metrics are implemented and tested
+[ ] Custom function metrics work correctly (10 metrics)
+[ ] LLM judge metrics work correctly (27 metrics)
+[ ] Scoring totals to 150 points
+[ ] Evaluation pipeline works end-to-end
+[ ] Improvement generation produces better prompts
+[ ] Iteration loop tracks best prompt correctly
+[ ] All stopping conditions work
+[ ] Visualizations render correctly
+[ ] Export functionality creates all files
+[ ] Mock mode works without API key
+[ ] Real mode works with API key
+[ ] Documentation is complete
+[ ] Examples are working
+[ ] Tests pass
+[ ] Demo is presentation-ready
+
+
+================================================================================
+ESTIMATED TOTAL TIME BREAKDOWN
+================================================================================
+
+Phase 1:  Setup & Configuration                2-3 hours
+Phase 2:  Custom Function Metrics              4-5 hours
+Phase 3:  LLM Judge Evaluator                  4-5 hours
+Phase 4:  Unified Evaluator Pipeline           3-4 hours
+Phase 5:  Prompt Improver                      3-4 hours
+Phase 6:  Iteration Manager                    4-5 hours
+Phase 7:  Visualization & Reporting            4-5 hours
+Phase 8:  Demo Package & User Interface        3-4 hours
+Phase 9:  Testing & Validation                 3-4 hours
+Phase 10: Documentation & Polish               3-4 hours
+Phase 11: Final Testing & Deployment Prep      2-3 hours
+
+TOTAL: 35-46 hours (approximately 5-6 working days for a junior engineer)
+
+
+================================================================================
+TIPS FOR SUCCESS
+================================================================================
+
+1. Work through phases sequentially - each builds on the previous
+2. Test each component thoroughly before moving to next phase
+3. Use mock mode extensively during development to save API costs
+4. Keep the metric configuration file as source of truth
+5. Print intermediate results frequently for debugging
+6. Commit code after completing each phase
+7. If stuck on a task for >2 hours, ask for help
+8. Review completed phases with senior engineer before proceeding
+9. Take breaks between phases to maintain code quality
+10. Document decisions and assumptions as you go
+
+
+================================================================================
+DELIVERABLES
+================================================================================
+
+At completion, you should have:
+- Fully functional prompt optimization system
+- 37 working metrics (10 custom, 27 LLM-judged)
+- Iterative improvement loop with best tracking
+- Comprehensive visualizations
+- Export functionality (6 output formats)
+- Demo package for presentations
+- Complete documentation
+- Test suite
+- Example usage scripts
+- Summary document
+
+Ready to deploy and demonstrate! 🚀
+
+
+================================================================================
+END OF CHECKLIST
+================================================================================
+```
